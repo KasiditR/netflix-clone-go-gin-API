@@ -11,7 +11,6 @@ import (
 type SignedDetails struct {
 	ID       string
 	Email    string
-	Username string
 	Image    string
 	jwt.StandardClaims
 }
@@ -19,11 +18,10 @@ type SignedDetails struct {
 var ACCESS_TOKEN_SECRET string = config.LoadConfig().AccessTokenSecret
 var REFRESh_TOKEN_SECRET string = config.LoadConfig().RefreshTokenSecret
 
-func TokenGenerator(id string, email string, username string, image string) (signedToken string, signedRefreshToken string, err error) {
+func TokenGenerator(id string, email string, image string) (signedToken string, signedRefreshToken string, err error) {
 	claims := &SignedDetails{
 		ID:       id,
 		Email:    email,
-		Username: username,
 		Image:    image,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(24)).Unix(),

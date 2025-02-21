@@ -19,7 +19,7 @@ func SignUp() gin.HandlerFunc {
 			return
 		}
 
-		if user.Username == nil || user.Email == nil || user.Password == nil {
+		if user.Email == nil || user.Password == nil {
 			c.JSON(http.StatusBadRequest, gin.H{"message": "Invalid body"})
 			return
 		}
@@ -27,12 +27,6 @@ func SignUp() gin.HandlerFunc {
 		emailCount, err := database.CountDocument(bson.M{"email": user.Email}, &user)
 		if err != nil || emailCount > 0 {
 			c.JSON(http.StatusBadRequest, gin.H{"message": "Email already exist"})
-			return
-		}
-
-		usernameCount, err := database.CountDocument(bson.M{"username": user.Username}, &user)
-		if err != nil || usernameCount > 0 {
-			c.JSON(http.StatusBadRequest, gin.H{"message": "Username already exist"})
 			return
 		}
 
@@ -46,7 +40,7 @@ func SignUp() gin.HandlerFunc {
 		user.Image = &profilePics[randomIndex]
 		user.SearchHistory = make([]models.SearchHistory, 0)
 
-		token, refreshToken, err := tokens.TokenGenerator(user.ID.Hex(), *user.Email, *user.Username, *user.Image)
+		token, refreshToken, err := tokens.TokenGenerator(user.ID.Hex(), *user.Email, *user.Image)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			return
@@ -59,9 +53,12 @@ func SignUp() gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"accessToken":  token,
-			"refreshToken": refreshToken,
-			"user":         user,
+			"accessToken":   token,
+			"refreshToken":  refreshToken,
+			"id":            user.ID,
+			"email":         user.Email,
+			"image":         user.Image,
+			"searchHistory": user.SearchHistory,
 		})
 	}
 }
@@ -93,7 +90,7 @@ func Login() gin.HandlerFunc {
 			return
 		}
 
-		token, refreshToken, err := tokens.TokenGenerator(foundUser.ID.Hex(), *foundUser.Email, *foundUser.Username, *foundUser.Image)
+		token, refreshToken, err := tokens.TokenGenerator(foundUser.ID.Hex(), *foundUser.Email, *foundUser.Image)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
@@ -101,9 +98,12 @@ func Login() gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"accessToken":  token,
-			"refreshToken": refreshToken,
-			"user":         foundUser,
+			"accessToken":   token,
+			"refreshToken":  refreshToken,
+			"id":            foundUser.ID,
+			"email":         foundUser.Email,
+			"image":         foundUser.Image,
+			"searchHistory": foundUser.SearchHistory,
 		})
 	}
 }
@@ -118,13 +118,11 @@ func AuthCheck() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, _ := c.Get("id")
 		email, _ := c.Get("email")
-		username, _ := c.Get("username")
 		image, _ := c.Get("image")
 
 		c.JSON(http.StatusOK, gin.H{
 			"id":       id,
 			"email":    email,
-			"username": username,
 			"image":    image,
 		})
 	}
@@ -147,7 +145,7 @@ func RefreshToken() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": msg})
 		}
 
-		token, _, err := tokens.TokenGenerator(payload.ID, payload.Email, payload.Username, payload.Image)
+		token, _, err := tokens.TokenGenerator(payload.ID, payload.Email, payload.Image)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			return

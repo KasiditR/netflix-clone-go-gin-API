@@ -6,7 +6,6 @@ import (
 
 type User struct {
 	ID            bson.ObjectID   `json:"_id" bson:"_id,omitempty"`
-	Username      *string         `json:"username" bson:"username" validate:"required"`
 	Email         *string         `json:"email" bson:"email" validate:"required"`
 	Password      *string         `json:"password" bson:"password" validate:"required"`
 	Image         *string         `json:"image" bson:"image"`

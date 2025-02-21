@@ -25,7 +25,6 @@ func Authentication() gin.HandlerFunc {
 
 		c.Set("id", claims.ID)
 		c.Set("email", claims.Email)
-		c.Set("username", claims.Username)
 		c.Set("image", claims.Image)
 		c.Next()
 	}
