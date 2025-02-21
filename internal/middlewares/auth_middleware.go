@@ -1,22 +1,25 @@
 package middlewares
 
 import (
+	"net/http"
+
 	"github.com/KasiditR/netflix-clone-go-gin-API/internal/tokens"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func Authentication() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		cookie, err := c.Cookie("jwt")
-		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "No Cookie"})
+		clientToken := c.GetHeader("Authorization")
+		if clientToken == "" {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "No Authorization Header"})
+			c.Abort()
 			return
 		}
 
-		claims, msg := tokens.ValidateToken(string(cookie))
-		if msg != "" {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": err})
+		claims, err := tokens.ValidateToken(clientToken)
+		if err != "" {
+			c.JSON(http.StatusInternalServerError, gin.H{"message": err})
+			c.Abort()
 			return
 		}
 

@@ -58,8 +58,6 @@ func SignUp() gin.HandlerFunc {
 			return
 		}
 
-		c.SetCookie("jwt", token, 3600, "/", "localhost", false, true)
-
 		c.JSON(http.StatusOK, gin.H{
 			"accessToken":  token,
 			"refreshToken": refreshToken,
@@ -102,8 +100,6 @@ func Login() gin.HandlerFunc {
 			return
 		}
 
-		c.SetCookie("jwt", token, 3600, "/", "localhost", false, true)
-
 		c.JSON(http.StatusOK, gin.H{
 			"accessToken":  token,
 			"refreshToken": refreshToken,
@@ -114,7 +110,6 @@ func Login() gin.HandlerFunc {
 
 func Logout() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.SetCookie("jwt", "", -1, "/", "localhost", false, true)
 		c.JSON(http.StatusOK, gin.H{"message": "Logout successfully"})
 	}
 }
@@ -158,7 +153,6 @@ func RefreshToken() gin.HandlerFunc {
 			return
 		}
 
-		c.SetCookie("jwt", token, 3600, "/", "localhost", false, true)
 		c.JSON(http.StatusOK, gin.H{"accessToken": token})
 	}
 }
