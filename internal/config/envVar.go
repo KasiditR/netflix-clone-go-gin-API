@@ -16,10 +16,10 @@ type Config struct {
 }
 
 func LoadConfig() *Config {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("err loading: %v", err)
-	}
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	log.Fatalf("err loading: %v", err)
+	// }
 	return &Config{
 		Port:               getEnv("PORT", "3000"),
 		MongoURI:           getEnv("MONGO_URI", ""),
